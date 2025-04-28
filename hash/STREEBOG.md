@@ -1,136 +1,90 @@
-# Streebog Hash Algorithm Implementation Documentation
+# Streebog Hash Function Usage Guide
 
 ## Overview
 
-This project provides an implementation of the Streebog hash algorithm (GOST R 34.11-2012), which is a Russian cryptographic hash function standard. The implementation supports both 256-bit and 512-bit hash variants.
+This implementation provides the Streebog (GOST R 34.11-2012) hash function with both 256-bit and 512-bit variants. The implementation is part of our blockchain project and can be easily integrated with other components.
 
-## Features
+## Quick Start
 
-- Supports both Streebog-256 and Streebog-512 hash algorithms
-- Can process:
-  - Strings
-  - Files
-  - Binary data
-- Includes test vectors from the standard for verification
-- Simple command-line interface for basic operations
+### Basic Usage
 
-## Build Instructions
-
-### Prerequisites
-
-- GCC compiler
-- GNU Make
-- Standard C library
-
-### Building
-
-To build the project:
-
-```bash
-make
-```
-
-This will create an executable named `stribog_test`.
-
-### Cleaning
-
-To clean up build artifacts:
-
-```bash
-make clean
-```
-
-### Running Tests
-
-To build and run the tests:
-
-```bash
-make run
-```
-
-## API Documentation
-
-### Data Types
-
+1. Include the necessary header:
 ```c
-struct stribog_ctx_t {
-    u8 h[BLOCK_SIZE];    // Hash state
-    u8 N[BLOCK_SIZE];     // Message length counter
-    u8 S[BLOCK_SIZE];     // Checksum
-    u8 size;             // Hash size (HASH256 or HASH512)
-};
+#include "stribog.h"
 ```
 
-### Key Functions
-
-1. **Initialization**
-   ```c
-   void init(struct stribog_ctx_t *ctx, u8 size);
-   ```
-   - Initializes the hash context
-   - `size`: Either `HASH256` or `HASH512`
-
-2. **Main Hashing Function**
-   ```c
-   void stribog(struct stribog_ctx_t *ctx, u8 *message, u64 len);
-   ```
-   - Computes the hash of a message
-   - `ctx`: Initialized context
-   - `message`: Input data to hash
-   - `len`: Length of input data in bytes
-
-3. **File Hashing**
-   ```c
-   void hash_file(struct stribog_ctx_t *ctx, const char *filename);
-   ```
-   - Hashes the contents of a file
-   - Writes result to "hash.txt"
-
-4. **Output Functions**
-   ```c
-   void print_hash(struct stribog_ctx_t *ctx);
-   void write_hash_to_file(struct stribog_ctx_t *ctx, const char *filename);
-   ```
-
-## Usage Examples
-
-### Command Line Interface
-
-The program provides a simple CLI:
-
-```
-Usage: stribog_test [OPTIONS] [INPUT]
-Options:
-  -s <string>  Hash a string
-  -f <file>    Hash a file
-  -b <size>    Hash size (256 or 512, default: 512)
-  -h           Show this help
+2. Create and initialize a context:
+```c
+struct stribog_ctx_t ctx;
+init(&ctx, HASH256);  // For 256-bit hash
+// OR
+init(&ctx, HASH512);  // For 512-bit hash
 ```
 
-### Programmatic Usage
+3. Hash your data:
+```c
+// Hash a string
+const char *message = "Your message";
+stribog(&ctx, (u8*)message, strlen(message));
 
-1. Hashing a string:
+// OR hash a file
+hash_file(&ctx, "input.txt");
+```
+
+4. Get the result:
+```c
+// Write to a specific file
+write_hash_to_file(&ctx, "output.txt");
+```
+
+## Available Functions
+
+- `init()` - Initialize the hash context
+- `stribog()` - Compute hash of data
+- `hash_file()` - Hash contents of a file
+- `hash_data()` - Hash data and save result
+- `write_hash_to_file()` - Save hash to file
+
+## Hash Sizes
+
+- HASH256 (0) - Produces 256-bit (32 bytes) hash
+- HASH512 (1) - Produces 512-bit (64 bytes) hash
+
+## Output Format
+
+The hash is written to file in hexadecimal format:
+- 256-bit hash: 64 hexadecimal characters
+- 512-bit hash: 128 hexadecimal characters
+
+## Example Use Cases
+
+### Hashing a Message
+```c
+struct stribog_ctx_t ctx;
+init(&ctx, HASH256);
+const char *msg = "Hello, World!";
+stribog(&ctx, (u8*)msg, strlen(msg));
+write_hash_to_file(&ctx, "hash.txt");
+```
+
+### Hashing a File
 ```c
 struct stribog_ctx_t ctx;
 init(&ctx, HASH512);
-stribog(&ctx, (u8*)"Hello, world!", 13);
-print_hash(&ctx);
+hash_file(&ctx, "document.txt");
+// Result is written to hash.txt
 ```
 
-2. Hashing binary data:
-```c
-u8 data[] = {0x00, 0x01, 0x02, 0x03};
-init(&ctx, HASH256);
-stribog(&ctx, data, sizeof(data));
-```
+## Common Issues
 
-## Test Vectors
+1. Always initialize context before use
+2. Make sure input files exist and are readable
+3. Check that you have write permissions for output files
+4. Use the same hash size (256/512) consistently in your application
 
-The implementation includes the standard test vectors from GOST R 34.11-2012, which are automatically verified when running the tests.
+## Integration Tips
 
-## Implementation Details
-
-- Block size: 64 bytes (512 bits)
-- Uses the standard S-box and linear transformation matrix
-- Implements the compression functions g_N and g_0 as specified
-- Follows the standard padding scheme
+1. The hash functions are designed to work with the Schnorr signature implementation
+2. Hash output is always written in hexadecimal format
+3. Default output file is "hash.txt" for most functions
+4. All functions handle memory allocation internally

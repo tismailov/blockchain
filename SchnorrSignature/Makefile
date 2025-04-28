@@ -1,22 +1,26 @@
 # Compiler settings
 CC = gcc
-CFLAGS = -Wall -Wextra -O2
-LDFLAGS =
+CFLAGS = -Wall -Wextra -O2 -I. -I..
+LDFLAGS = -lgmp
 
 # Source files
-SRCS = stribog.c test.c
+SRCS = generators.c signature.c test.c ../hash/stribog.c
 OBJS = $(SRCS:.c=.o)
-TARGET = stribog_test
+TARGET = test
 
 # All Targets
 all: $(TARGET)
 
 # Build the target executable
 $(TARGET): $(OBJS)
-	$(CC) $(LDFLAGS) -o $@ $^
+	$(CC) -o $@ $^ $(LDFLAGS)
 
 # Generic rule to build object files
 %.o: %.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
+# Specific rule for hash/stribog.c
+../hash/stribog.o: ../hash/stribog.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
 # Clean up

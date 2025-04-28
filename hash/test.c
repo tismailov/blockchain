@@ -2,7 +2,6 @@
 #include <string.h>
 #include "stribog.h"
 
-
 // Function for outputting hash to console
 void print_hash_hex(const char* label, struct stribog_ctx_t* ctx) {
     printf("%s: ", label);
@@ -11,7 +10,7 @@ void print_hash_hex(const char* label, struct stribog_ctx_t* ctx) {
 
 int main() {
     struct stribog_ctx_t ctx;
-    
+
     printf("=== Testing the Streebog (GOST R 34.11-2012) algorithm ===\n\n");
 
     // Test 1: Hashing a string with different output sizes
@@ -54,7 +53,7 @@ int main() {
     // Test 4: Demonstrating work with binary data
     printf("Test 4: Hashing binary data\n");
     u8 binary_data[] = {0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07};
-    
+
     init(&ctx, HASH512);
     stribog(&ctx, binary_data, sizeof(binary_data));
     print_hash_hex("  GOST 512-bit (binary)", &ctx);
