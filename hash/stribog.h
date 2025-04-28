@@ -25,6 +25,7 @@ struct stribog_ctx_t {
     u8 size;
 };
 
+// Adds two 512-bit vectors modulo 2^512
 static void addmod512(u8 *dst, u8 *src, u8 *add) {
     u8 i;
     u16 overrun = 0;
@@ -35,6 +36,7 @@ static void addmod512(u8 *dst, u8 *src, u8 *add) {
     }
 }
 
+// Adds a 32-bit integer to a 512-bit vector modulo 2^512
 static void addmod512_u32(u8 *dst, u8 *src, u32 add) {
     u8 i;
 
@@ -45,6 +47,7 @@ static void addmod512_u32(u8 *dst, u8 *src, u32 add) {
     }
 }
 
+// Computes the bitwise XOR of two 512-bit vectors
 static void xor512(u8 *dst, u8 *a, u8 *b) {
     u8 i;
 
@@ -53,6 +56,7 @@ static void xor512(u8 *dst, u8 *a, u8 *b) {
     }
 }
 
+// Applies the S-box substitution to a 512-bit vector
 static void S(u8 *vect) {
     u8 i;
 
@@ -61,6 +65,7 @@ static void S(u8 *vect) {
     }
 }
 
+// Applies the linear transformation to a 512-bit vector
 static void LP(u8 *vect) {
     u8 i, j, k;
     u8 tmp[64];
@@ -81,10 +86,12 @@ static void LP(u8 *vect) {
     }
 }
 
+// Computes the XOR of two 512-bit vectors
 static void X(u8 *dst, u8 *a, u8 *b) {
     xor512(dst, a, b);
 }
 
+// Applies the encryption function to a 512-bit vector
 static void E(u8 *dst, u8 *k, u8 *m) {
     u8 i;
     u8 K[64];
@@ -101,6 +108,7 @@ static void E(u8 *dst, u8 *k, u8 *m) {
     }
 }
 
+// Applies the compression function g_N to the hash state
 static void g_N(u8 *h, u8 *N, u8 *m) {
     u8 hash[BLOCK_SIZE];
     memcpy(hash, h, BLOCK_SIZE);
@@ -112,6 +120,7 @@ static void g_N(u8 *h, u8 *N, u8 *m) {
     xor512(h, h, m);
 }
 
+// Applies the compression function g_0 to the hash state
 static void g_0(u8 *h, u8 *m) {
     u8 hash[64];
     memcpy(hash, h, BLOCK_SIZE);
@@ -122,6 +131,7 @@ static void g_0(u8 *h, u8 *m) {
     xor512(h, h, m);
 }
 
+// Computes the hash of a message using the Streebog algorithm
 static void stribog(struct stribog_ctx_t *ctx, u8 *message, u64 len) {
     u8 m[BLOCK_SIZE];
     u8 padding;
@@ -150,6 +160,7 @@ static void stribog(struct stribog_ctx_t *ctx, u8 *message, u64 len) {
     g_0(ctx->h, ctx->S);
 }
 
+// Initializes the Streebog context with the specified hash size
 static void init(struct stribog_ctx_t *ctx, u8 size) {
     memset(ctx->N, 0x00, BLOCK_SIZE);
     memset(ctx->S, 0x00, BLOCK_SIZE);
@@ -160,5 +171,14 @@ static void init(struct stribog_ctx_t *ctx, u8 size) {
     else
         memcpy(ctx->h, iv256, BLOCK_SIZE);
 }
+
+// Prints the hash to the console
+void print_hash(struct stribog_ctx_t *ctx);
+
+// Hashes the contents of a file and writes the hash to a file
+void hash_file(struct stribog_ctx_t *ctx, const char *filename);
+
+// Processes command line arguments and performs the requested hash operation
+void process_input(int argc, char *argv[]);
 
 #endif
