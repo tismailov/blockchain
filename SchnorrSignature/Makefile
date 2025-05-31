@@ -7,7 +7,7 @@ LDFLAGS = -lgmp -lgmpxx
 
 # Source files
 SRCS = generators.c signature.c test.c ../hash/stribog.c
-CPPSRCS = prng_c_interface.cpp prng_instance.cpp ../src/prng.cpp ../hash/hash_conventer.cpp ../hash/hash_c_interface.cpp
+CPPSRCS = prng_c_interface.cpp prng_instance.cpp ../src/prng.cpp ../hash/hash_conventer.cpp ../hash/hash_c_interface.cpp signer.cpp
 OBJS = $(SRCS:.c=.o) $(CPPSRCS:.cpp=.o)
 TARGET = test
 
