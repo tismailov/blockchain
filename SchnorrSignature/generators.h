@@ -4,6 +4,10 @@
 #include <gmp.h>
 #include "prng_c_interface.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * Generates a random prime number of a specified bit length.
  *
@@ -32,5 +36,9 @@ void generate_random_generator(mpz_t g, mpz_t p, PRNG_Handle_t prng);
  * @param prng The PRNG handle used for generating random numbers.
  */
 void generate_keys(mpz_t x, mpz_t P, mpz_t g, mpz_t p, PRNG_Handle_t prng);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // GENERATORS_H
