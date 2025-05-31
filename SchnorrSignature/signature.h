@@ -1,5 +1,5 @@
-#ifndef _SIGNATURE_H
-#define _SIGNATURE_H
+#ifndef SIGNATURE_H
+#define SIGNATURE_H
 
 #include <gmp.h>
 #include "../hash/stribog.h"
@@ -8,6 +8,11 @@
 #include <time.h>
 #include <string.h>
 #include "generators.h"
+#include "prng_c_interface.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /**
  * Signs a message using the Schnorr signature scheme.
@@ -18,10 +23,10 @@
  * @param x The secret key.
  * @param g The generator of the group Z_p^*.
  * @param p The prime number defining the group Z_p^*.
- * @param state The GMP random state used for generating random numbers.
+ * @param prng The PRNG handle used for generating random numbers.
  * @param ctx The Streebog context used for hashing.
  */
-void sign_message(const char *message, mpz_t r, mpz_t s, mpz_t x, mpz_t g, mpz_t p, gmp_randstate_t state, struct stribog_ctx_t *ctx);
+void sign_message(const char *message, mpz_t r, mpz_t s, mpz_t x, mpz_t g, mpz_t p, PRNG_Handle_t prng, struct stribog_ctx_t *ctx);
 
 /**
  * Verifies a Schnorr signature.
@@ -37,4 +42,8 @@ void sign_message(const char *message, mpz_t r, mpz_t s, mpz_t x, mpz_t g, mpz_t
  */
 int verify_signature(const char *message, mpz_t r, mpz_t s, mpz_t P, mpz_t g, mpz_t p, struct stribog_ctx_t *ctx);
 
+#ifdef __cplusplus
+}
 #endif
+
+#endif // SIGNATURE_H

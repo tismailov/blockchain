@@ -1,11 +1,14 @@
 # Compiler settings
 CC = gcc
+CXX = g++
 CFLAGS = -Wall -Wextra -O2 -I. -I..
-LDFLAGS = -lgmp
+CXXFLAGS = $(CFLAGS)
+LDFLAGS = -lgmp -lgmpxx
 
 # Source files
 SRCS = generators.c signature.c test.c ../hash/stribog.c
-OBJS = $(SRCS:.c=.o)
+CPPSRCS = prng_c_interface.cpp prng_instance.cpp ../src/prng.cpp ../hash/hash_conventer.cpp ../hash/hash_c_interface.cpp
+OBJS = $(SRCS:.c=.o) $(CPPSRCS:.cpp=.o)
 TARGET = test
 
 # All Targets
@@ -13,11 +16,15 @@ all: $(TARGET)
 
 # Build the target executable
 $(TARGET): $(OBJS)
-	$(CC) -o $@ $^ $(LDFLAGS)
+	$(CXX) -o $@ $^ $(LDFLAGS)
 
-# Generic rule to build object files
+# Generic rule to build C object files
 %.o: %.c
 	$(CC) $(CFLAGS) -c $< -o $@
+
+# Generic rule to build C++ object files
+%.o: %.cpp
+	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 # Specific rule for hash/stribog.c
 ../hash/stribog.o: ../hash/stribog.c

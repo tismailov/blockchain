@@ -2,6 +2,20 @@
 #include <time.h>
 #include <gmp.h>
 #include "signature.h"
+#include "prng_c_interface.h"
+
+// Forward declaration of PRNG class
+#ifdef __cplusplus
+class PRNG;
+#else
+typedef struct PRNG PRNG;
+#endif
+
+// Function to create PRNG instance (implemented in C++)
+#ifdef __cplusplus
+extern "C"
+#endif
+PRNG* create_prng_instance(void);
 
 int main() {
     mpz_t p, g, x, P, r, s;
@@ -9,21 +23,18 @@ int main() {
 
     unsigned long bits = 256;
 
-    gmp_randstate_t state;
-    gmp_randinit_default(state);
-
-    // Set the random seed based on the current time
-    unsigned long seed = (unsigned long)time(NULL);
-    gmp_randseed_ui(state, seed);
+    // Create PRNG instance
+    PRNG* prng_instance = create_prng_instance();
+    PRNG_Handle_t prng_handle = PRNG_create_from_existing(prng_instance);
 
     // Generate a random prime number p
-    generate_random_prime(p, bits, state);
+    generate_random_prime(p, bits, prng_handle);
 
     // Generate a random generator g of the group Z_p^*
-    generate_random_generator(g, p, state);
+    generate_random_generator(g, p, prng_handle);
 
     // Generate keys
-    generate_keys(x, P, g, p, state);
+    generate_keys(x, P, g, p, prng_handle);
     
     printf("\n=== Key Generation ===\n");
     printf("Prime p: ");
@@ -43,7 +54,7 @@ int main() {
 
     // Sign the message
     struct stribog_ctx_t ctx;
-    sign_message(message, r, s, x, g, p, state, &ctx);
+    sign_message(message, r, s, x, g, p, prng_handle, &ctx);
     
     printf("Signature components:\n");
     printf("r: ");
@@ -55,15 +66,14 @@ int main() {
     // Verify the signature
     printf("=== Verification Process ===\n");
     if (verify_signature(message, r, s, P, g, p, &ctx)) {
-        printf("Signature verification SUCCESSFUL\n");
-        printf("All components match and the signature is valid!\n");
+        printf("Signature is valid!\n");
     } else {
-        printf("Signature verification FAILED\n");
-        printf("The signature is invalid or has been tampered with.\n");
+        printf("Signature is invalid!\n");
     }
 
-    gmp_randclear(state);
+    // Cleanup
+    PRNG_destroy(prng_handle);
     mpz_clears(p, g, x, P, r, s, NULL);
-
+    
     return 0;
 }

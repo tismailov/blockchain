@@ -14,20 +14,22 @@
  * @param x The signer's private key
  * @param g The generator of the multiplicative group
  * @param p The prime modulus defining the field
- * @param state Random state for generating k
+ * @param prng PRNG handle for generating k
  * @param ctx Unused parameter for hash context compatibility
  * @note The function uses HASH256 for computing e = H(r || message)
  * @note The signature (r,s) satisfies the equation g^s = r * P^e mod p
  */
-void sign_message(const char *message, mpz_t r, mpz_t s, mpz_t x, mpz_t g, mpz_t p, gmp_randstate_t state, struct stribog_ctx_t *ctx UNUSED) {
+void sign_message(const char *message, mpz_t r, mpz_t s, mpz_t x, mpz_t g, mpz_t p, 
+                 PRNG_Handle_t prng, struct stribog_ctx_t *ctx UNUSED) {
     mpz_t k, e, p_minus_1;
     mpz_inits(k, e, p_minus_1, NULL);
 
     // Compute p-1
     mpz_sub_ui(p_minus_1, p, 1);
 
-    // Generate a random k
-    mpz_urandomm(k, state, p_minus_1);
+    // Generate a random k using PRNG
+    PRNG_generate_num(prng, k);
+    mpz_mod(k, k, p_minus_1);  // Ensure k is in the correct range
     mpz_powm(r, g, k, p);
 
     // Compute e = H(r || message)

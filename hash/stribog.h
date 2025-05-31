@@ -3,6 +3,10 @@
 
 #include "types.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define BLOCK_SIZE      64
 #define BLOCK_BIT_SIZE  (BLOCK_SIZE * 8)
 
@@ -90,5 +94,9 @@ void write_hash_to_file(struct stribog_ctx_t *ctx, const char *filename);
  * @param len Length of the data block in bytes
  */
 void hash_data(struct stribog_ctx_t *ctx, const u8 *data, size_t len);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
